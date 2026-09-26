@@ -1,6 +1,6 @@
 
 # 1. IAM Role for Lambda (Trust Policy)
-resource "aws_iam_role" "lambda_role" {
+resource "aws_iam_role" "lambda_newurl_role" {
   name = "group3-coaching-16-lambda-role-newurl"
 
   assume_role_policy = jsonencode({
@@ -51,37 +51,37 @@ resource "aws_iam_policy" "lambda_dynamodb_policy" {
 
 # 3. Attach Policy to IAM Role
 resource "aws_iam_role_policy_attachment" "lambda_policy_attach" {
-  role       = aws_iam_role.lambda_role.name
+  role       = aws_iam_role.lambda_newurl_role.name
   policy_arn = aws_iam_policy.lambda_dynamodb_policy.arn
 }
 
 # Attach AWSLambdaBasicExecutionRole AWS Managed Policy to IAM Role
 resource "aws_iam_role_policy_attachment" "lambda_basic_execution" {
-  role       = aws_iam_role.lambda_role.name
+  role       = aws_iam_role.lambda_newurl_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
 # Attach AWSXrayWriteOnlyAccess AWS Managed Policy to IAM Role
 resource "aws_iam_role_policy_attachment" "lambda_xray_access" {
-  role       = aws_iam_role.lambda_role.name
+  role       = aws_iam_role.lambda_newurl_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSXrayWriteOnlyAccess"
 }
 
 # 4. Package Lambda Code (Generates a zip from a local file)
-data "archive_file" "lambda_zip" {
+data "archive_file" "newurl_lambda_zip" {
   type        = "zip"
   source_file = "${path.module}/lambda-fun-newurl.py" # Path to your lambda function file
-  output_path = "${path.module}/lambda_function.zip"
+  output_path = "${path.module}/lambda_newurl_function.zip"
 }
 
 # 5. Lambda Function
-resource "aws_lambda_function" "my_lambda" {
-  filename         = data.archive_file.lambda_zip.output_path
-  function_name    = "dynamodb_handler_function"
-  role             = aws_iam_role.lambda_role.arn
-  handler          = "lambda_function.lambda_handler" # Filename.exported_function
+resource "aws_lambda_function" "newurl_lambda" {
+  filename         = data.archive_file.newurl_lambda_zip.output_path
+  function_name    = "newurl_function"
+  role             = aws_iam_role.lambda_newurl_role.arn
+  handler          = "lambda_newurl_function.lambda_handler" # Filename.exported_function
   runtime          = "python3.13"     # Updated to latest supported runtime
-  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+  source_code_hash = data.archive_file.newurl_lambda_zip.output_base64sha256
 
   environment {
     variables = {
@@ -90,14 +90,3 @@ resource "aws_lambda_function" "my_lambda" {
   }
 }
 
-# 6. Sample DynamoDB Table (for complete dependency references)
-resource "aws_dynamodb_table" "coaching_table" {
-  name         = "group3-coaching-16-table"
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "id"
-
-  attribute {
-    name = "id"
-    type = "S"
-  }
-}
