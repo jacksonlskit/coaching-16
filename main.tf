@@ -31,6 +31,3 @@ resource "aws_s3_bucket" "workshop" {
 }
 
 
-module route53 {
-  source = "../route-53"
-}
