@@ -35,7 +35,7 @@ resource "aws_iam_role_policy_attachment" "lambda_shortid_basic_execution" {
 # Attach AWSXrayWriteOnlyAccess AWS Managed Policy to IAM Role
 resource "aws_iam_role_policy_attachment" "lambda_shortid_xray_access" {
   role       = aws_iam_role.lambda_shortid_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSXrayWriteOnlyAccess"
+  policy_arn = "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
 }
 
 # 4. Package Lambda Code (Generates a zip from a local file)
